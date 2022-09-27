@@ -36,7 +36,8 @@ initialize_eav_db :-
     asserta_eav(bob, bp_office, [180, 100], T0), % bob's recommendation is htn_grade_2
     asserta_eav(bob, bp_office, [170, 100], T1),
     asserta_eav(bob, bp_office, [160, 100], Now),
-    asserta_eav(bob, bp_home, [160, 100], Now).
+    asserta_eav(bob, bp_home, [160, 100], Now),
+    asserta_eav(charlie, bp_home, [160, 100], Now). % charlie has high bp_home but no bp_office measurements
 
 % Recommendations
 
@@ -81,3 +82,33 @@ avg_bp_office_measurement(E, AvgSys, AvgDia) :-
     AvgSys is (S1 + S2) / 2,
     AvgDia is (D1 + D2) / 2,
     E = BoundE.
+
+% Expert System via metalogic
+% Drawn from SWISH expert system example.
+
+prove(true) :- !.
+prove((B, Bs)) :-
+    !,
+    prove(B),
+    prove(Bs).
+prove(H) :- % rule added from SO.
+    predicate_property(H, built_in),
+    !,
+    call(H).
+prove(H) :-
+    clause(H, B),
+    prove(B).
+prove(H) :-
+    askable_yes_no(H),
+    writeln(H),
+    read(Answer),
+	Answer == yes.
+
+% prove bp_home
+prove(eav(_, bp_home, [SysHome, DiaHome], _)) :-
+    writeln("bp_home systolic?"),
+    read(SysHome),
+    writeln("bp_home diastolic?"),
+    read(DiaHome).
+
+askable_yes_no(high_bp_office(_)).
