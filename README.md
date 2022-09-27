@@ -14,10 +14,7 @@ swipl bp.pl
 Set up the entity-attribute-value database.
 ```Prolog
 ?- clear_eav_db. % optional
-true.
-
 ?- initialize_eav_db.
-true.
 ```
 
 Example `bp.pl` queries:
@@ -32,6 +29,10 @@ Example `bp.pl` queries:
 ?- avg_bp_office_measurement(alice, SysOffice, DiaOffice).
 
 % solve in the style of an expert system with user input.
-?- once(prove(htn_grade_2(charlie))).
+?- htn_grade_2(charlie).                 % insufficient data to return true...
+?- once(prove(htn_grade_2(charlie))).    % however, we can ask for more data to "prove" it!
 ?- once(prove(htn_grade_2(dave))).
+
+% add fact to EAV database.
+?- get_time(Now), asserta_eav(evgeni, bp_home, [130, 80], Now).
 ```
