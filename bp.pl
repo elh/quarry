@@ -104,13 +104,15 @@ prove(H) :-
 
 % prove bp_home
 prove(eav(E, bp_home, [S, D], _)) :-
+    get_time(Now),
     format(atom(Estr), "~w", E),
     string_concat(Estr, ": bp_home systolic?", SysPrompt),
     writeln(SysPrompt),
     read(S),
     string_concat(Estr, ": bp_home diastolic?", DiaPrompt),
     writeln(DiaPrompt),
-    read(D).
+    read(D),
+    asserta_eav(E, bp_home, [S, D], Now).
 % prove avg_bp_office_measurement
 prove(avg_bp_office_measurement(E, S, D)) :-
     format(atom(Estr), "~w", E),
