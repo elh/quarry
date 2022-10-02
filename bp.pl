@@ -40,7 +40,9 @@ initialize_eav_db :-
     asserta_eav(bob, bp_office, [170, 100], T1),
     asserta_eav(bob, bp_office, [160, 100], Now),
     asserta_eav(bob, bp_home, [160, 100], Now),
-    asserta_eav(charlie, bp_home, [160, 100], Now). % charlie has high bp_home but no bp_office measurements
+    asserta_eav(charlie, bp_home, [160, 100], Now), % charlie has high bp_home but no bp_office measurements
+    asserta_eav(dave, bp_office, [130, 85], T0), % dave only has 2 bp_office measurements
+    asserta_eav(dave, bp_office, [125, 80], T1).
 
 % Recommendations
 recommendation(E, htn_grade_2) :- htn_grade_2(E).
@@ -113,12 +115,58 @@ prove(eav(E, bp_home, [S, D], _)) :-
     writeln(DiaPrompt),
     read(D),
     asserta_eav(E, bp_home, [S, D], Now).
+
 % prove avg_bp_office_measurement
 prove(avg_bp_office_measurement(E, S, D)) :-
+    findall(E, eav(E, bp_office, _, _), Es),
+    length(Es, Len),
+    Len is 2,
+    get_time(Now),
     format(atom(Estr), "~w", E),
-    string_concat(Estr, ": bp_office systolic average?", SysPrompt),
+    string_concat(Estr, ": bp_office systolic? (1 missing value. enter each separately)", SysPrompt),
     writeln(SysPrompt),
-    read(S),
-    string_concat(Estr, ": bp_office diastolic average?", DiaPrompt),
+    read(S1),
+    string_concat(Estr, ": bp_office diastolic? (1 missing value. enter each separately)", DiaPrompt),
     writeln(DiaPrompt),
-    read(D).
+    read(D1),
+    asserta_eav(E, bp_office, [S1, D1], Now),
+    avg_bp_office_measurement(E, S, D).
+
+prove(avg_bp_office_measurement(E, S, D)) :-
+    findall(E, eav(E, bp_office, _, _), Es),
+    length(Es, Len),
+    Len is 1,
+    get_time(Now),
+    format(atom(Estr), "~w", E),
+    string_concat(Estr, ": bp_office systolic? (2 missing value. enter each separately)", SysPrompt),
+    writeln(SysPrompt),
+    read(S1),
+    read(S2),
+    string_concat(Estr, ": bp_office diastolic? (2 missing value. enter each separately)", DiaPrompt),
+    writeln(DiaPrompt),
+    read(D1),
+    read(D2),
+    asserta_eav(E, bp_office, [S1, D1], Now),
+    asserta_eav(E, bp_office, [S2, D2], Now),
+    avg_bp_office_measurement(E, S, D).
+
+prove(avg_bp_office_measurement(E, S, D)) :-
+    findall(E, eav(E, bp_office, _, _), Es),
+    length(Es, Len),
+    Len is 0,
+    get_time(Now),
+    format(atom(Estr), "~w", E),
+    string_concat(Estr, ": bp_office systolic? (3 missing value. enter each separately)", SysPrompt),
+    writeln(SysPrompt),
+    read(S1),
+    read(S2),
+    read(S3),
+    string_concat(Estr, ": bp_office diastolic? (3 missing value. enter each separately)", DiaPrompt),
+    writeln(DiaPrompt),
+    read(D1),
+    read(D2),
+    read(D3),
+    asserta_eav(E, bp_office, [S1, D1], Now),
+    asserta_eav(E, bp_office, [S2, D2], Now),
+    asserta_eav(E, bp_office, [S3, D3], Now),
+    avg_bp_office_measurement(E, S, D).
